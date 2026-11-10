@@ -13,39 +13,67 @@
             <p>Acompanhe o progresso e veja os vencedores!</p>
         </header>
 
-        <div class="card">
-            <h2>📊 Progresso dos Grupos</h2>
-            <table class="tabela">
-                <thead>
-                    <tr>
-                        <th>Grupo/Pessoa</th>
-                        <th>Fase Atual</th>
-                        <th>Tempo Total</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody id="tabelaGrupos">
-                    <tr>
-                        <td colspan="4" style="text-align:center;">Nenhum grupo cadastrado ainda.</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="card">
-            <h2>🥇 Pódio — Mais Rápidos!</h2>
-            <div id="podioArea">
-                <p style="text-align:center; color:#666;">Aguardando conclusão dos grupos...</p>
+        <!-- Área de Login do Administrador -->
+        <div class="card" id="areaLoginAdmin">
+            <h2>🔑 Acesso do Administrador</h2>
+            <label for="senhaAdmin">Senha:</label>
+            <input type="password" id="senhaAdmin" placeholder="Digite a senha...">
+            <button class="btn btn-principal" onclick="verificarSenha()">Entrar</button>
+            <p id="erroSenha" class="oculto" style="color:red;">Senha incorreta!</p>
+            <div class="botoes" style="margin-top:20px;">
+                <a href="index.html" class="btn btn-voltar">← Voltar ao Início</a>
             </div>
         </div>
 
-        <div class="botoes" style="justify-content:center;">
-            <a href="index.html" class="btn btn-voltar">← Voltar ao Início</a>
-            <button class="btn btn-secundario" onclick="limparDados()">🗑️ Limpar Dados (Professores)</button>
+        <!-- Área do Painel Completo (só admin vê) -->
+        <div id="conteudoAdmin" class="oculto">
+            <div class="card">
+                <h2>📊 Progresso dos Grupos</h2>
+                <table class="tabela">
+                    <thead>
+                        <tr>
+                            <th>Grupo/Pessoa</th>
+                            <th>Fase Atual</th>
+                            <th>Tempo Total</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaGrupos">
+                        <tr>
+                            <td colspan="4" style="text-align:center;">Nenhum grupo cadastrado ainda.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <h2>🥇 Pódio — Mais Rápidos!</h2>
+                <div id="podioAreaAdmin"></div>
+            </div>
+
+            <div class="botoes" style="justify-content:center;">
+                <button class="btn btn-secundario" onclick="limparDados()">🗑️ Limpar Todos os Dados</button>
+                <a href="index.html" class="btn btn-voltar">← Voltar ao Início</a>
+                <button class="btn btn-voltar" onclick="sairAdmin()">🚪 Sair</button>
+            </div>
+        </div>
+
+        <!-- Área do Pódio Público (só quem conclui vê) -->
+        <div id="conteudoPublico" class="oculto">
+            <div class="card">
+                <h2>🥇 Pódio — Mais Rápidos!</h2>
+                <div id="podioAreaPublico"></div>
+            </div>
+            <div class="botoes" style="justify-content:center;">
+                <a href="index.html" class="btn btn-voltar">← Voltar ao Início</a>
+            </div>
         </div>
     </div>
 
     <script>
+        // ⚙️ CONFIGURAÇÃO — Altere a senha aqui se quiser!
+        const SENHA_ADMIN = "admin123";
+
         function formatarTempo(segundos) {
             if (!segundos) return '--';
             const min = Math.floor(segundos / 60);
@@ -54,12 +82,38 @@
             return `${seg}s`;
         }
 
-        function carregarDados() {
+        function verificarSenha() {
+            const senha = document.getElementById('senhaAdmin').value;
+            if (senha === SENHA_ADMIN) {
+                sessionStorage.setItem('adminLogado', 'sim');
+                mostrarPainelAdmin();
+            } else {
+                document.getElementById('erroSenha').classList.remove('oculto');
+            }
+        }
+
+        function sairAdmin() {
+            sessionStorage.removeItem('adminLogado');
+            location.reload();
+        }
+
+        function mostrarPainelAdmin() {
+            document.getElementById('areaLoginAdmin').classList.add('oculto');
+            document.getElementById('conteudoAdmin').classList.remove('oculto');
+            carregarTabela();
+            carregarPodio('podioAreaAdmin');
+        }
+
+        function mostrarPodioPublico() {
+            document.getElementById('areaLoginAdmin').classList.add('oculto');
+            document.getElementById('conteudoPublico').classList.remove('oculto');
+            carregarPodio('podioAreaPublico');
+        }
+
+        function carregarTabela() {
             const grupos = JSON.parse(localStorage.getItem('grupos') || '[]');
             const tabela = document.getElementById('tabelaGrupos');
-            const podioArea = document.getElementById('podioArea');
-
-            // Tabela de progresso
+            
             if (grupos.length === 0) {
                 tabela.innerHTML = `<tr><td colspan="4" style="text-align:center;">Nenhum grupo cadastrado ainda.</td></tr>`;
             } else {
@@ -74,18 +128,21 @@
                     </tr>
                 `).join('');
             }
+        }
 
-            // Pódio — apenas os que concluíram, ordenados pelo menor tempo
+        function carregarPodio(elementoId) {
+            const grupos = JSON.parse(localStorage.getItem('grupos') || '[]');
             const concluidos = grupos.filter(g => g.concluido).sort((a, b) => a.tempo - b.tempo);
+            const area = document.getElementById(elementoId);
             
             if (concluidos.length >= 1) {
-                podioArea.innerHTML = `<div class="podio">
+                area.innerHTML = `<div class="podio">
                     ${concluidos[1] ? `
                     <div class="podio-item prata">
                         <div style="font-size:24px;">🥈</div>
                         <div style="font-weight:bold; margin-top:5px;">${concluidos[1].nome}</div>
                         <div style="font-size:0.9rem;">${formatarTempo(concluidos[1].tempo)}</div>
-                    </div>` : '<div></div>'}
+                    </div>` : ''}
                     
                     <div class="podio-item ouro">
                         <div style="font-size:28px;">🥇</div>
@@ -98,28 +155,35 @@
                         <div style="font-size:24px;">🥉</div>
                         <div style="font-weight:bold; margin-top:5px;">${concluidos[2].nome}</div>
                         <div style="font-size:0.9rem;">${formatarTempo(concluidos[2].tempo)}</div>
-                    </div>` : '<div></div>'}
+                    </div>` : ''}
                 </div>
                 <p style="text-align:center; margin-top:20px;">Total de ${concluidos.length} grupos concluídos!</p>`;
             } else {
-                podioArea.innerHTML = `<p style="text-align:center; color:#666;">Aguardando grupos completarem o desafio...</p>`;
+                area.innerHTML = `<p style="text-align:center; color:#666;">Aguardando grupos completarem o desafio...</p>`;
             }
         }
 
         function limparDados() {
-            if (confirm('Tem certeza que deseja apagar todos os dados? Esta ação não pode ser desfeita!')) {
-                localStorage.removeItem('grupos');
-                localStorage.removeItem('nomeGrupo');
-                localStorage.removeItem('faseAtual');
-                localStorage.removeItem('tempoInicio');
-                localStorage.removeItem('fase1Concluida');
-                localStorage.removeItem('fase2Concluida');
-                carregarDados();
-                alert('Dados limpos com sucesso!');
+            if (confirm('⚠️ Tem certeza que deseja apagar TODOS os dados? Essa ação não pode ser desfeita!')) {
+                localStorage.clear();
+                alert('✅ Todos os dados foram limpos!');
+                carregarTabela();
+                carregarPodio('podioAreaAdmin');
             }
         }
 
-        carregarDados();
+        // Verifica quem está acessando
+        window.onload = function() {
+            const nomeGrupo = localStorage.getItem('nomeGrupo');
+            const grupoConcluido = JSON.parse(localStorage.getItem('grupos') || '[]')
+                .find(g => g.nome === nomeGrupo && g.concluido);
+
+            if (sessionStorage.getItem('adminLogado') === 'sim') {
+                mostrarPainelAdmin();
+            } else if (grupoConcluido) {
+                mostrarPodioPublico();
+            }
+        };
     </script>
 </body>
 </html>
