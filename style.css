@@ -1,0 +1,232 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #1e3a5f 0%, #2c5386 100%);
+    min-height: 100vh;
+    color: #fff;
+    padding: 20px;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+header {
+    text-align: center;
+    padding: 30px 20px;
+}
+
+header h1 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+header p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+.card {
+    background: #fff;
+    color: #1e3a5f;
+    border-radius: 12px;
+    padding: 30px;
+    margin-bottom: 25px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+.card h2 {
+    color: #1e3a5f;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #2c5386;
+    padding-bottom: 10px;
+}
+
+.card p {
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+.botoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.btn-principal {
+    background: #28a745;
+    color: #fff;
+}
+
+.btn-secundario {
+    background: #17a2b8;
+    color: #fff;
+}
+
+.btn-voltar {
+    background: #6c757d;
+    color: #fff;
+}
+
+.btn-proxima {
+    background: #007bff;
+    color: #fff;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+input, button {
+    padding: 10px 14px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    margin: 5px 0;
+}
+
+input:focus {
+    outline: none;
+    border-color: #2c5386;
+}
+
+.dica {
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+    padding: 12px;
+    margin: 15px 0;
+    color: #856404;
+    border-radius: 4px;
+}
+
+.mensagem {
+    padding: 12px;
+    border-radius: 6px;
+    margin: 15px 0;
+    font-weight: bold;
+}
+
+.sucesso {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.erro {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.codigo-mensagem {
+    font-size: 1.3rem;
+    font-weight: bold;
+    background: #e9ecef;
+    padding: 15px;
+    border-radius: 6px;
+    text-align: center;
+    letter-spacing: 2px;
+    margin: 15px 0;
+}
+
+.podio {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 15px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+.podio-item {
+    text-align: center;
+    padding: 15px;
+    border-radius: 8px;
+    width: 120px;
+}
+
+.ouro {
+    background: linear-gradient(to bottom, #ffd700, #f0c800);
+    order: 2;
+    height: 140px;
+}
+
+.prata {
+    background: linear-gradient(to bottom, #c0c0c0, #a8a8a8);
+    order: 1;
+    height: 110px;
+}
+
+.bronze {
+    background: linear-gradient(to bottom, #cd7f32, #b8702c);
+    order: 3;
+    height: 90px;
+}
+
+.tabela {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.tabela th, .tabela td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.tabela th {
+    background: #2c5386;
+    color: #fff;
+}
+
+.progresso {
+    background: #e9ecef;
+    border-radius: 20px;
+    height: 10px;
+    margin: 10px 0;
+}
+
+.progresso-barra {
+    background: #28a745;
+    height: 100%;
+    border-radius: 20px;
+    transition: width 0.3s ease;
+}
+
+.fase-info {
+    background: #e7f3ff;
+    border-left: 4px solid #007bff;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+}
+
+.oculto {
+    display: none;
+}
