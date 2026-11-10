@@ -49,7 +49,7 @@
             document.getElementById('tentativas').textContent = tentativas;
 
             if (resposta === respostaCorreta) {
-                area.innerHTML = `<div class="mensagem sucesso">✅ Você acertou! A frase era: <strong>${respostaCorreta}</strong><br>Você pode seguir para a próxima fase.</div>`;
+                area.innerHTML = `<div class="mensagem sucesso">✅ Você acertou!<br>Siga para a próxima fase.</div>`;
                 localStorage.setItem('fase1Concluida', 'true');
                 setTimeout(() => {
                     window.location.href = 'fase2.html';
