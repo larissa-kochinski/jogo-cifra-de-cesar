@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro - Desafio de Criptografia</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔐 Desafio de Criptografia</h1>
+            <p>Informe seu grupo para começar!</p>
+        </header>
+
+        <div class="card">
+            <h2>📝 Cadastro do Grupo/Pessoa</h2>
+            
+            <label for="nomeGrupo"><strong>Nome do Grupo ou Participante:</strong></label>
+            <input type="text" id="nomeGrupo" placeholder="Digite aqui..." style="width: 100%;">
+            
+            <div class="botoes">
+                <a href="index.html" class="btn btn-voltar">← Voltar</a>
+                <button class="btn btn-principal" onclick="iniciarDesafio()">Começar Fase 1 →</button>
+            </div>
+            
+            <p id="aviso" class="oculto" style="color: red; margin-top:15px;">Por favor, digite um nome!</p>
+        </div>
+    </div>
+
+    <script>
+        function iniciarDesafio() {
+            const nome = document.getElementById('nomeGrupo').value.trim();
+            if (nome === '') {
+                document.getElementById('aviso').classList.remove('oculto');
+                return;
+            }
+            localStorage.setItem('nomeGrupo', nome);
+            localStorage.setItem('faseAtual', '1');
+            localStorage.setItem('tempoInicio', Date.now());
+            window.location.href = 'fase1.html';
+        }
+    </script>
+</body>
+</html>
