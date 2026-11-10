@@ -28,7 +28,6 @@
             <input type="text" id="resposta" placeholder="Digite aqui..." style="width: 100%;">
             
             <div class="botoes">
-                <a href="fase2.html" class="btn btn-voltar">← Voltar</a>
                 <button class="btn btn-principal" onclick="verificarResposta()">Enviar Resposta</button>
             </div>
 
@@ -72,7 +71,7 @@
             tentativas--;
             document.getElementById('tentativas').textContent = tentativas;
 
-            if (tentativas <= 1) {
+            if (tentativas <= 2) {
                 document.getElementById('dicaExtra').classList.remove('oculto');
             }
 
