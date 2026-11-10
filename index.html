@@ -11,21 +11,56 @@
         <header>
             <h1>🔐 Desafio de Criptografia</h1>
             <p>Decifre as mensagens e chegue ao final!</p>
-
         </header>
 
         <div class="card">
             <h2>Bem-vindo ao desafio!</h2>
             <p>Você precisará decifrar 3 mensagens usando a Cifra de César.</p>
             <p>Cada fase tem um número limitado de tentativas.</p> 
-            <p>Dica: Todas as respostas estão em letras minúsculas. </p>
+            <p>Dica: Todas as respostas estão em letras minúsculas.</p>
             <p>Boa sorte!</p>
             
             <div class="botoes">
                 <a href="cadastro.html" class="btn btn-principal">🚀 Começar Desafio</a>
-                <a href="painel.html" class="btn btn-secundario">📊 Ver Painel</a>
+                <button class="btn btn-secundario" onclick="abrirSenhaPainel()">📊 Acessar Painel</button>
+            </div>
+
+            <!-- Caixa de senha -->
+            <div id="caixaSenhaPainel" class="oculto" style="margin-top: 20px; padding: 20px; background: #f5f5f5; border-radius: 8px;">
+                <h3>🔑 Senha do Administrador</h3>
+                <input type="password" id="senhaPainel" placeholder="Digite a senha..." style="width: 100%; margin: 10px 0;">
+                <p id="erroSenhaPainel" class="oculto" style="color: red;">Senha incorreta! Tente novamente.</p>
+                <div class="botoes">
+                    <button class="btn btn-voltar" onclick="fecharSenhaPainel()">Cancelar</button>
+                    <button class="btn btn-principal" onclick="verificarSenhaPainel()">Entrar</button>
+                </div>
             </div>
         </div>
     </div>
+
+    <script>
+        // Senha do administrador — pode alterar se quiser!
+        const SENHA_ADMIN = "techGirls";
+
+        function abrirSenhaPainel() {
+            document.getElementById('caixaSenhaPainel').classList.remove('oculto');
+            document.getElementById('senhaPainel').value = '';
+            document.getElementById('erroSenhaPainel').classList.add('oculto');
+        }
+
+        function fecharSenhaPainel() {
+            document.getElementById('caixaSenhaPainel').classList.add('oculto');
+        }
+
+        function verificarSenhaPainel() {
+            const senha = document.getElementById('senhaPainel').value;
+            if (senha === SENHA_ADMIN) {
+                sessionStorage.setItem('adminLogado', 'sim');
+                window.location.href = 'painel.html';
+            } else {
+                document.getElementById('erroSenhaPainel').classList.remove('oculto');
+            }
+        }
+    </script>
 </body>
 </html>
