@@ -54,6 +54,7 @@ header p {
 }
 
 .botoes {
+    justify-content: center; 
     display: flex;
     flex-wrap: wrap;
     gap: 15px;
