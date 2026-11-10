@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fase 3 - Desafio de Criptografia</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔐 Desafio de Criptografia</h1>
+            <p id="nomeUsuario"></p>
+        </header>
+
+        <div class="card">
+            <div class="fase-info">
+                <strong>Fase 3 — Nível Difícil</strong><br>
+                Tentativas restantes: <span id="tentativas">6</span>
+            </div>
+
+            <h2>Mensagem Criptografada:</h2>
+            <div class="codigo-mensagem">gshmks</div>
+
+            <p id="dicaExtra" class="dica oculto">💡 Dica: Algo que usamos para programar</p>
+
+            <label for="resposta">Qual é a palavra original?</label>
+            <input type="text" id="resposta" placeholder="Digite aqui..." style="width: 100%;">
+            
+            <div class="botoes">
+                <a href="fase2.html" class="btn btn-voltar">← Voltar</a>
+                <button class="btn btn-principal" onclick="verificarResposta()">Enviar Resposta</button>
+            </div>
+
+            <div id="mensagemArea"></div>
+        </div>
+    </div>
+
+    <script>
+        const respostaCorreta = "codigo";
+        let tentativas = 6;
+        
+        document.getElementById('nomeUsuario').textContent = 
+            localStorage.getItem('nomeGrupo') ? `Grupo: ${localStorage.getItem('nomeGrupo')}` : '';
+
+        function formatarTempo(segundos) {
+            const min = Math.floor(segundos / 60);
+            const seg = segundos % 60;
+            if (min > 0) return `${min} min e ${seg} seg`;
+            return `${seg} segundos`;
+        }
+
+        function salvarConclusao(tempoTotal) {
+            const nome = localStorage.getItem('nomeGrupo') || 'Anônimo';
+            let grupos = JSON.parse(localStorage.getItem('grupos') || '[]');
+            
+            grupos = grupos.filter(g => g.nome !== nome);
+            
+            grupos.push({
+                nome: nome,
+                fase: 3,
+                tempo: tempoTotal,
+                concluido: true
+            });
+            
+            localStorage.setItem('grupos', JSON.stringify(grupos));
+        }
+
+        function verificarResposta() {
+            const resposta = document.getElementById('resposta').value.trim().toLowerCase();
+            const area = document.getElementById('mensagemArea');
+            tentativas--;
+            document.getElementById('tentativas').textContent = tentativas;
+
+            if (tentativas <= 1) {
+                document.getElementById('dicaExtra').classList.remove('oculto');
+            }
+
+            if (resposta === respostaCorreta) {
+                const tempoFinal = Date.now();
+                const tempoInicio = parseInt(localStorage.getItem('tempoInicio'));
+                const tempoTotal = Math.round((tempoFinal - tempoInicio) / 1000);
+                
+                area.innerHTML = `<div class="mensagem sucesso">🎉 Parabéns! Você completou as três fases!<br>
+                    A palavra era: <strong>${respostaCorreta}</strong><br>
+                    ⏱ Tempo total: <strong>${formatarTempo(tempoTotal)}</strong>
+                    <div class="botoes" style="margin-top:15px;">
+                        <a href="painel.html" class="btn btn-principal">🏆 Ver Resultado Final</a>
+                    </div></div>`;
+                
+                salvarConclusao(tempoTotal);
+                document.querySelector('.btn-principal').disabled = true;
+            } else if (tentativas > 0) {
+                area.innerHTML = `<div class="mensagem erro">❌ Tente de novo!</div>`;
+            } else {
+                area.innerHTML = `<div class="mensagem erro">😔 Suas tentativas acabaram. A resposta era: <strong>${respostaCorreta}</strong><br>
+                    <a href="fase3.html" class="btn">Tentar novamente</a></div>`;
+                document.querySelector('.btn-principal').disabled = true;
+            }
+        }
+    </script>
+</body>
+</html>
