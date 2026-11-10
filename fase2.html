@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fase 2 - Desafio de Criptografia</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔐 Desafio de Criptografia</h1>
+            <p id="nomeUsuario"></p>
+        </header>
+
+        <div class="card">
+            <div class="fase-info">
+                <strong>Fase 2 — Nível Médio</strong><br>
+                Tentativas restantes: <span id="tentativas">3</span>
+            </div>
+
+            <h2>Mensagem Criptografada:</h2>
+            <div class="codigo-mensagem">frqilghqfldolgdh</div>
+
+            <p><strong>Dica:</strong> A terceira letra da palavra original é <strong>N</strong></p>
+
+            <label for="resposta">Qual é a palavra original?</label>
+            <input type="text" id="resposta" placeholder="Digite aqui..." style="width: 100%;">
+            
+            <div class="botoes">
+                <a href="fase1.html" class="btn btn-voltar">← Voltar</a>
+                <button class="btn btn-principal" onclick="verificarResposta()">Enviar Resposta</button>
+            </div>
+
+            <div id="mensagemArea"></div>
+        </div>
+    </div>
+
+    <script>
+        const respostaCorreta = "confidencialidade";
+        let tentativas = 3;
+        
+        document.getElementById('nomeUsuario').textContent = 
+            localStorage.getItem('nomeGrupo') ? `Grupo: ${localStorage.getItem('nomeGrupo')}` : '';
+
+        function verificarResposta() {
+            const resposta = document.getElementById('resposta').value.trim().toLowerCase();
+            const area = document.getElementById('mensagemArea');
+            tentativas--;
+            document.getElementById('tentativas').textContent = tentativas;
+
+            if (resposta === respostaCorreta) {
+                area.innerHTML = `<div class="mensagem sucesso">✅ Você acertou! A palavra era: <strong>${respostaCorreta}</strong><br>Você pode seguir para a próxima fase.</div>`;
+                localStorage.setItem('fase2Concluida', 'true');
+                setTimeout(() => {
+                    window.location.href = 'fase3.html';
+                }, 2000);
+            } else if (tentativas > 0) {
+                area.innerHTML = `<div class="mensagem erro">❌ Tente de novo!</div>`;
+            } else {
+                area.innerHTML = `<div class="mensagem erro">😔 Suas tentativas acabaram. A resposta era: <strong>${respostaCorreta}</strong><br><a href="fase2.html" style="color:red;">Tentar novamente</a></div>`;
+                document.querySelector('.btn-principal').disabled = true;
+            }
+        }
+    </script>
+</body>
+</html>
