@@ -12,12 +12,6 @@ body {
     padding: 20px;
 }
 
-.dica-resposta {
-    color: #ffd700;
-    font-weight: bold;
-    margin-top: 10px;
-}
-
 .container {
     max-width: 800px;
     margin: 0 auto;
