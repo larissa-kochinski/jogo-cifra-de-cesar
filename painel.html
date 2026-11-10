@@ -13,19 +13,7 @@
             <p>Acompanhe o progresso e veja os vencedores!</p>
         </header>
 
-        <!-- Área de Login do Administrador -->
-        <div class="card" id="areaLoginAdmin">
-            <h2>🔑 Acesso do Administrador</h2>
-            <label for="senhaAdmin">Senha:</label>
-            <input type="password" id="senhaAdmin" placeholder="Digite a senha...">
-            <button class="btn btn-principal" onclick="verificarSenha()">Entrar</button>
-            <p id="erroSenha" class="oculto" style="color:red;">Senha incorreta!</p>
-            <div class="botoes" style="margin-top:20px;">
-                <a href="index.html" class="btn btn-voltar">← Voltar ao Início</a>
-            </div>
-        </div>
-
-        <!-- Área do Painel Completo (só admin vê) -->
+        <!-- Área do Painel Completo (Admin) -->
         <div id="conteudoAdmin" class="oculto">
             <div class="card">
                 <h2>📊 Progresso dos Grupos</h2>
@@ -68,12 +56,20 @@
                 <a href="index.html" class="btn btn-voltar">← Voltar ao Início</a>
             </div>
         </div>
+
+        <!-- Acesso negado -->
+        <div id="acessoNegado" class="oculto">
+            <div class="card">
+                <h2>🔒 Acesso Restrito</h2>
+                <p>Esta página é restrita ao administrador. Por favor, acesse pelo botão no Início e digite a senha.</p>
+                <div class="botoes" style="justify-content:center;">
+                    <a href="index.html" class="btn btn-principal">← Voltar ao Início</a>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
-        // ⚙️ CONFIGURAÇÃO — Altere a senha aqui se quiser!
-        const SENHA_ADMIN = "admin123";
-
         function formatarTempo(segundos) {
             if (!segundos) return '--';
             const min = Math.floor(segundos / 60);
@@ -82,32 +78,9 @@
             return `${seg}s`;
         }
 
-        function verificarSenha() {
-            const senha = document.getElementById('senhaAdmin').value;
-            if (senha === SENHA_ADMIN) {
-                sessionStorage.setItem('adminLogado', 'sim');
-                mostrarPainelAdmin();
-            } else {
-                document.getElementById('erroSenha').classList.remove('oculto');
-            }
-        }
-
         function sairAdmin() {
             sessionStorage.removeItem('adminLogado');
-            location.reload();
-        }
-
-        function mostrarPainelAdmin() {
-            document.getElementById('areaLoginAdmin').classList.add('oculto');
-            document.getElementById('conteudoAdmin').classList.remove('oculto');
-            carregarTabela();
-            carregarPodio('podioAreaAdmin');
-        }
-
-        function mostrarPodioPublico() {
-            document.getElementById('areaLoginAdmin').classList.add('oculto');
-            document.getElementById('conteudoPublico').classList.remove('oculto');
-            carregarPodio('podioAreaPublico');
+            window.location.href = 'index.html';
         }
 
         function carregarTabela() {
@@ -172,16 +145,21 @@
             }
         }
 
-        // Verifica quem está acessando
+        // Verifica permissão ao carregar a página
         window.onload = function() {
             const nomeGrupo = localStorage.getItem('nomeGrupo');
-            const grupoConcluido = JSON.parse(localStorage.getItem('grupos') || '[]')
-                .find(g => g.nome === nomeGrupo && g.concluido);
+            const grupos = JSON.parse(localStorage.getItem('grupos') || '[]');
+            const grupoConcluido = grupos.find(g => g.nome === nomeGrupo && g.concluido);
 
             if (sessionStorage.getItem('adminLogado') === 'sim') {
-                mostrarPainelAdmin();
+                document.getElementById('conteudoAdmin').classList.remove('oculto');
+                carregarTabela();
+                carregarPodio('podioAreaAdmin');
             } else if (grupoConcluido) {
-                mostrarPodioPublico();
+                document.getElementById('conteudoPublico').classList.remove('oculto');
+                carregarPodio('podioAreaPublico');
+            } else {
+                document.getElementById('acessoNegado').classList.remove('oculto');
             }
         };
     </script>
