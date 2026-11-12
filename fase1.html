@@ -42,7 +42,7 @@
         document.getElementById('nomeUsuario').textContent = 
         localStorage.getItem('nomeGrupo') ? `Grupo: ${localStorage.getItem('nomeGrupo')}` : '';
         
-        async function verificarResposta() {  // ← tem o "async" aqui!
+        async function verificarResposta() {
             const resposta = document.getElementById('resposta').value.trim().toLowerCase();
             const area = document.getElementById('mensagemArea');
             tentativas--;
@@ -54,8 +54,8 @@
                 localStorage.setItem('fase1Concluida', 'true');
                 localStorage.setItem('faseAtual', '2');
         
-                // Envia para o banco
-                await fetch('/api/dados/salvar', {
+                // ✅ Caminho da API atualizado
+                await fetch('/dados?acao=salvar', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
