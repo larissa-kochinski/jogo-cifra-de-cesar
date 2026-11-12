@@ -22,19 +22,18 @@
                         <tr>
                             <th>Grupo/Pessoa</th>
                             <th>Fase Atual</th>
-                            <th>Tempo Total</th>
                             <th>Status</th>
                         </tr>
                     </thead>
                     <tbody id="tabelaGrupos">
                         <tr>
-                            <td colspan="4" style="text-align:center;">Nenhum grupo cadastrado ainda.</td>
+                            <td colspan="3" style="text-align:center;">Nenhum grupo cadastrado ainda.</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
-            <div class="card">
+            <div id="secaoPodio" class="card" style="display: none;">
                 <h2>🥇 Pódio — Mais Rápidos!</h2>
                 <div id="podioAreaAdmin"></div>
             </div>
@@ -87,26 +86,40 @@
             const resposta = await fetch('/api/dados');
             const grupos = await resposta.json();
             const tabela = document.getElementById('tabelaGrupos');
+            const secaoPodio = document.getElementById('secaoPodio');
             
             if (grupos.length === 0) {
-                tabela.innerHTML = `<tr><td colspan="4" style="text-align:center;">Nenhum grupo cadastrado ainda.</td></tr>`;
+                tabela.innerHTML = `<tr><td colspan="3" style="text-align:center;">Nenhum grupo cadastrado ainda.</td></tr>`;
+                secaoPodio.style.display = 'none';
+                return;
+            }
+
+            // Mostra todos os grupos e suas fases
+            tabela.innerHTML = grupos.map(g => `
+                <tr>
+                    <td><strong>${g.nome}</strong></td>
+                    <td>Fase ${g.fase}</td>
+                    <td>${g.concluido === 1
+                        ? '<span style="color:green;">✅ Concluído</span>'
+                        : '<span style="color:orange;">⏳ Em andamento</span>'}</td>
+                </tr>
+            `).join('');
+
+            // Mostra o pódio SOMENTE se houver algum grupo concluído
+            const temConcluidos = grupos.some(g => g.concluido === 1);
+            if (temConcluidos) {
+                secaoPodio.style.display = 'block';
+                await carregarPodio('podioAreaAdmin', grupos);
             } else {
-                tabela.innerHTML = grupos.map(g => `
-                    <tr>
-                        <td><strong>${g.nome}</strong></td>
-                        <td>Fase ${g.fase}</td>
-                        <td>${g.tempo ? formatarTempo(g.tempo) : 'Em andamento'}</td>
-                        <td>${g.concluido === 1
-                            ? '<span style="color:green;">✅ Concluído</span>'
-                            : '<span style="color:orange;">⏳ Em andamento</span>'}</td>
-                    </tr>
-                `).join('');
+                secaoPodio.style.display = 'none';
             }
         }
 
-        async function carregarPodio(elementoId) {
-            const resposta = await fetch('/api/dados');
-            const grupos = await resposta.json();
+        async function carregarPodio(elementoId, grupos = null) {
+            if (!grupos) {
+                const resposta = await fetch('/api/dados');
+                grupos = await resposta.json();
+            }
             const concluidos = grupos.filter(g => g.concluido === 1).sort((a, b) => a.tempo - b.tempo);
             const area = document.getElementById(elementoId);
             
@@ -133,8 +146,6 @@
                     </div>` : ''}
                 </div>
                 <p style="text-align:center; margin-top:20px;">Total de ${concluidos.length} grupos concluídos!</p>`;
-            } else {
-                area.innerHTML = `<p style="text-align:center; color:#666;">Aguardando grupos completarem o desafio...</p>`;
             }
         }
 
@@ -143,7 +154,6 @@
                 await fetch('/api/dados/limpar', { method: 'POST' });
                 alert('✅ Todos os dados foram limpos!');
                 await carregarTabela();
-                await carregarPodio('podioAreaAdmin');
             }
         }
 
@@ -157,31 +167,25 @@
             if (sessionStorage.getItem('adminLogado') === 'sim') {
                 document.getElementById('conteudoAdmin').classList.remove('oculto');
                 await carregarTabela();
-                await carregarPodio('podioAreaAdmin');
             } else if (grupoConcluido) {
                 document.getElementById('conteudoPublico').classList.remove('oculto');
-                await carregarPodio('podioAreaPublico');
-            } else {
                 document.getElementById('acessoNegado').classList.add('oculto');
-            }
-        };
-    setInterval(async function() {
-            if (sessionStorage.getItem('adminLogado') === 'sim') {
-                await carregarTabela();
-                await carregarPodio('podioAreaAdmin');
+                await carregarPodio('podioAreaPublico', grupos);
             } else {
-                const nomeGrupo = localStorage.getItem('nomeGrupo');
-                const resposta = await fetch('/api/dados');
-                const grupos = await resposta.json();
-                const grupoConcluido = grupos.find(g => g.nome === nomeGrupo && g.concluido === 1);
-                
-                if (grupoConcluido) {
-                    document.getElementById('conteudoPublico').classList.remove('oculto');
-                    document.getElementById('acessoNegado').classList.add('oculto');
-                    await carregarPodio('podioAreaPublico');
-                }
+                document.getElementById('acessoNegado').classList.remove('oculto');
             }
-        }, 5000); // ← tempo em milissegundos (5000 = 5 segundos)
+
+            // 🔄 Atualização automática a cada 5 segundos
+            setInterval(async function() {
+                if (sessionStorage.getItem('adminLogado') === 'sim') {
+                    await carregarTabela();
+                } else if (grupoConcluido) {
+                    const r = await fetch('/api/dados');
+                    const g = await r.json();
+                    await carregarPodio('podioAreaPublico', g);
+                }
+            }, 5000);
+        };
     </script>
 </body>
 </html>
