@@ -50,13 +50,13 @@
     
             // ✅ Envia para o banco de dados
             await fetch('/api/dados/salvar', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    nome: localStorage.getItem('nomeGrupo'), 
-                    fase: 3,        // ← aqui é fase 3 agora!
-                    tempo: 0, 
-                    concluido: false 
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                nome: localStorage.getItem('nomeGrupo'), 
+                fase: 3, 
+                tempo: 0, 
+                concluido: false 
                 })
             });
     
