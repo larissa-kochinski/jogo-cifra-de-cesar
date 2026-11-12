@@ -52,15 +52,15 @@
     async function salvarConclusao(tempoTotal) {
         const nome = localStorage.getItem('nomeGrupo') || 'Anônimo';
         
-        // Envia para o banco compartilhado
-        await fetch('/api/dados/salvar', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-            nome: nome, 
-            fase: 3, 
-            tempo: tempoTotal, 
-            concluido: true 
+        // ✅ Caminho da API atualizado
+        await fetch('/dados?acao=salvar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                nome: nome, 
+                fase: 3, 
+                tempo: tempoTotal, 
+                concluido: true 
             })
         });
     }
@@ -86,7 +86,7 @@
                     <a href="painel.html" class="btn btn-principal">🏆 Ver Resultado Final</a>
                 </div></div>`;
             
-            await salvarConclusao(tempoTotal);  // ← com await agora
+            await salvarConclusao(tempoTotal);
             document.querySelector('.btn-principal').disabled = true;
         } else if (tentativas > 0) {
             area.innerHTML = `<div class="mensagem erro">❌ Tente de novo!</div>`;
