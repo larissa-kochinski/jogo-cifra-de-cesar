@@ -70,98 +70,101 @@
     </div>
 
     <script>
-        function formatarTempo(segundos) {
-            if (!segundos) return '--';
-            const min = Math.floor(segundos / 60);
-            const seg = segundos % 60;
-            if (min > 0) return `${min}m ${seg}s`;
-            return `${seg}s`;
-        }
+    function formatarTempo(segundos) {
+        if (!segundos) return '--';
+        const min = Math.floor(segundos / 60);
+        const seg = segundos % 60;
+        if (min > 0) return `${min}m ${seg}s`;
+        return `${seg}s`;
+    }
 
-        function sairAdmin() {
-            sessionStorage.removeItem('adminLogado');
-            window.location.href = 'index.html';
-        }
+    function sairAdmin() {
+        sessionStorage.removeItem('adminLogado');
+        window.location.href = 'index.html';
+    }
 
-        function carregarTabela() {
-            const grupos = JSON.parse(localStorage.getItem('grupos') || '[]');
-            const tabela = document.getElementById('tabelaGrupos');
-            
-            if (grupos.length === 0) {
-                tabela.innerHTML = `<tr><td colspan="4" style="text-align:center;">Nenhum grupo cadastrado ainda.</td></tr>`;
-            } else {
-                tabela.innerHTML = grupos.map(g => `
-                    <tr>
-                        <td><strong>${g.nome}</strong></td>
-                        <td>Fase ${g.fase}</td>
-                        <td>${g.tempo ? formatarTempo(g.tempo) : 'Em andamento'}</td>
-                        <td>${g.concluido 
-                            ? '<span style="color:green;">✅ Concluído</span>' 
-                            : '<span style="color:orange;">⏳ Em andamento</span>'}</td>
-                    </tr>
-                `).join('');
-            }
+    async function carregarTabela() {
+        const resposta = await fetch('/api/dados');
+        const grupos = await resposta.json();
+        const tabela = document.getElementById('tabelaGrupos');
+        
+        if (grupos.length === 0) {
+            tabela.innerHTML = `<tr><td colspan="4" style="text-align:center;">Nenhum grupo cadastrado ainda.</td></tr>`;
+        } else {
+            tabela.innerHTML = grupos.map(g => `
+                <tr>
+                    <td><strong>${g.nome}</strong></td>
+                    <td>Fase ${g.fase}</td>
+                    <td>${g.tempo ? formatarTempo(g.tempo) : 'Em andamento'}</td>
+                    <td>${g.concluido === 1
+                        ? '<span style="color:green;">✅ Concluído</span>' 
+                        : '<span style="color:orange;">⏳ Em andamento</span>'}</td>
+                </tr>
+            `).join('');
         }
+    }
 
-        function carregarPodio(elementoId) {
-            const grupos = JSON.parse(localStorage.getItem('grupos') || '[]');
-            const concluidos = grupos.filter(g => g.concluido).sort((a, b) => a.tempo - b.tempo);
-            const area = document.getElementById(elementoId);
-            
-            if (concluidos.length >= 1) {
-                area.innerHTML = `<div class="podio">
-                    ${concluidos[1] ? `
-                    <div class="podio-item prata">
-                        <div style="font-size:24px;">🥈</div>
-                        <div style="font-weight:bold; margin-top:5px;">${concluidos[1].nome}</div>
-                        <div style="font-size:0.9rem;">${formatarTempo(concluidos[1].tempo)}</div>
-                    </div>` : ''}
-                    
-                    <div class="podio-item ouro">
-                        <div style="font-size:28px;">🥇</div>
-                        <div style="font-weight:bold; margin-top:5px;">${concluidos[0].nome}</div>
-                        <div style="font-size:0.9rem;">${formatarTempo(concluidos[0].tempo)}</div>
-                    </div>
-                    
-                    ${concluidos[2] ? `
-                    <div class="podio-item bronze">
-                        <div style="font-size:24px;">🥉</div>
-                        <div style="font-weight:bold; margin-top:5px;">${concluidos[2].nome}</div>
-                        <div style="font-size:0.9rem;">${formatarTempo(concluidos[2].tempo)}</div>
-                    </div>` : ''}
+    async function carregarPodio(elementoId) {
+        const resposta = await fetch('/api/dados');
+        const grupos = await resposta.json();
+        const concluidos = grupos.filter(g => g.concluido === 1).sort((a, b) => a.tempo - b.tempo);
+        const area = document.getElementById(elementoId);
+        
+        if (concluidos.length >= 1) {
+            area.innerHTML = `<div class="podio">
+                ${concluidos[1] ? `
+                <div class="podio-item prata">
+                    <div style="font-size:24px;">🥈</div>
+                    <div style="font-weight:bold; margin-top:5px;">${concluidos[1].nome}</div>
+                    <div style="font-size:0.9rem;">${formatarTempo(concluidos[1].tempo)}</div>
+                </div>` : ''}
+                
+                <div class="podio-item ouro">
+                    <div style="font-size:28px;">🥇</div>
+                    <div style="font-weight:bold; margin-top:5px;">${concluidos[0].nome}</div>
+                    <div style="font-size:0.9rem;">${formatarTempo(concluidos[0].tempo)}</div>
                 </div>
-                <p style="text-align:center; margin-top:20px;">Total de ${concluidos.length} grupos concluídos!</p>`;
-            } else {
-                area.innerHTML = `<p style="text-align:center; color:#666;">Aguardando grupos completarem o desafio...</p>`;
-            }
+                
+                ${concluidos[2] ? `
+                <div class="podio-item bronze">
+                    <div style="font-size:24px;">🥉</div>
+                    <div style="font-weight:bold; margin-top:5px;">${concluidos[2].nome}</div>
+                    <div style="font-size:0.9rem;">${formatarTempo(concluidos[2].tempo)}</div>
+                </div>` : ''}
+            </div>
+            <p style="text-align:center; margin-top:20px;">Total de ${concluidos.length} grupos concluídos!</p>`;
+        } else {
+            area.innerHTML = `<p style="text-align:center; color:#666;">Aguardando grupos completarem o desafio...</p>`;
         }
+    }
 
-        function limparDados() {
-            if (confirm('⚠️ Tem certeza que deseja apagar TODOS os dados? Essa ação não pode ser desfeita!')) {
-                localStorage.clear();
-                alert('✅ Todos os dados foram limpos!');
-                carregarTabela();
-                carregarPodio('podioAreaAdmin');
-            }
+    async function limparDados() {
+        if (confirm('⚠️ Tem certeza que deseja apagar TODOS os dados? Essa ação não pode ser desfeita!')) {
+            await fetch('/api/dados/limpar', { method: 'POST' });
+            alert('✅ Todos os dados foram limpos!');
+            await carregarTabela();
+            await carregarPodio('podioAreaAdmin');
         }
+    }
 
-        // Verifica permissão ao carregar a página
-        window.onload = function() {
-            const nomeGrupo = localStorage.getItem('nomeGrupo');
-            const grupos = JSON.parse(localStorage.getItem('grupos') || '[]');
-            const grupoConcluido = grupos.find(g => g.nome === nomeGrupo && g.concluido);
+    window.onload = async function() {
+        const nomeGrupo = localStorage.getItem('nomeGrupo');
+        const resposta = await fetch('/api/dados');
+        const grupos = await resposta.json();
+        const grupoConcluido = grupos.find(g => g.nome === nomeGrupo && g.concluido === 1);
 
-            if (sessionStorage.getItem('adminLogado') === 'sim') {
-                document.getElementById('conteudoAdmin').classList.remove('oculto');
-                carregarTabela();
-                carregarPodio('podioAreaAdmin');
-            } else if (grupoConcluido) {
-                document.getElementById('conteudoPublico').classList.remove('oculto');
-                carregarPodio('podioAreaPublico');
-            } else {
-                document.getElementById('acessoNegado').classList.remove('oculto');
-            }
-        };
-    </script>
+        if (sessionStorage.getItem('adminLogado') === 'sim') {
+            document.getElementById('conteudoAdmin').classList.remove('oculto');
+            await carregarTabela();
+            await carregarPodio('podioAreaAdmin');
+        } else if (grupoConcluido) {
+            document.getElementById('conteudoPublico').classList.remove('oculto');
+            await carregarPodio('podioAreaPublico');
+        } else {
+            document.getElementById('acessoNegado').classList.remove('oculto');
+        }
+    };
+</script>
+
 </body>
 </html>
