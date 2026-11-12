@@ -5,10 +5,14 @@ export async function onRequestGet({ env }) {
     ).all();
     
     return new Response(JSON.stringify(results || []), {
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json" },
+      status: 200
     });
   } catch (erro) {
-    return new Response(JSON.stringify({ erro: erro.message }), { status: 500 });
+    return new Response(JSON.stringify({ erro: erro.message }), {
+      headers: { "Content-Type": "application/json" },
+      status: 500
+    });
   }
 }
 
@@ -16,29 +20,38 @@ export async function onRequestPost({ request, env }) {
   try {
     const url = new URL(request.url);
     const acao = url.searchParams.get('acao');
-    const dados = await request.json();
-    
+
     if (acao === 'salvar') {
+      const dados = await request.json();
       const { nome, fase, tempo, concluido } = dados;
+      
       await env.jogo_criptografia.prepare(`
         INSERT OR REPLACE INTO grupos (nome, fase, tempo, concluido, ultima_atualizacao)
         VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
       `).bind(nome, fase, tempo, concluido ? 1 : 0).run();
       
       return new Response(JSON.stringify({ sucesso: true }), {
-        headers: { "Content-Type": "application/json" }
+        headers: { "Content-Type": "application/json" },
+        status: 200
       });
     }
-    
+
     if (acao === 'limpar') {
-  await env.jogo_criptografia.prepare("DELETE FROM grupos").run();
-  return new Response(JSON.stringify({ sucesso: true }), {
-    headers: { "Content-Type": "application/json" }
-  });
-}
-    
-    return new Response(JSON.stringify({ erro: "Ação inválida" }), { status: 400 });
+      await env.jogo_criptografia.prepare("DELETE FROM grupos").run();
+      return new Response(JSON.stringify({ sucesso: true }), {
+        headers: { "Content-Type": "application/json" },
+        status: 200
+      });
+    }
+
+    return new Response(JSON.stringify({ erro: "Ação inválida" }), {
+      headers: { "Content-Type": "application/json" },
+      status: 400
+    });
   } catch (erro) {
-    return new Response(JSON.stringify({ erro: erro.message }), { status: 500 });
+    return new Response(JSON.stringify({ erro: erro.message }), {
+      headers: { "Content-Type": "application/json" },
+      status: 500
+    });
   }
 }
