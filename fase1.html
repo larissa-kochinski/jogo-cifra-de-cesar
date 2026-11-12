@@ -36,31 +36,47 @@
     </div>
 
     <script>
-        const respostaCorreta = "dados bem guardados evitam problemas";
-        let tentativas = 3;
+       const respostaCorreta = "dados bem guardados evitam problemas";
+let tentativas = 3;
+
+document.getElementById('nomeUsuario').textContent = 
+localStorage.getItem('nomeGrupo') ? `Grupo: ${localStorage.getItem('nomeGrupo')}` : '';
+
+async function verificarResposta() {  // ← tem o "async" aqui!
+    const resposta = document.getElementById('resposta').value.trim().toLowerCase();
+    const area = document.getElementById('mensagemArea');
+    tentativas--;
+    document.getElementById('tentativas').textContent = tentativas;
+
+    if (resposta === respostaCorreta) {
+        area.innerHTML = `<div class="mensagem sucesso">✅ Você acertou!<br>Siga para a próxima fase.</div>`;
         
-        document.getElementById('nomeUsuario').textContent = 
-            localStorage.getItem('nomeGrupo') ? `Grupo: ${localStorage.getItem('nomeGrupo')}` : '';
+        localStorage.setItem('fase1Concluida', 'true');
+        localStorage.setItem('faseAtual', '2');
 
-        function verificarResposta() {
-            const resposta = document.getElementById('resposta').value.trim().toLowerCase();
-            const area = document.getElementById('mensagemArea');
-            tentativas--;
-            document.getElementById('tentativas').textContent = tentativas;
+        // Envia para o banco
+        await fetch('/api/dados/salvar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                nome: localStorage.getItem('nomeGrupo'), 
+                fase: 2, 
+                tempo: 0, 
+                concluido: false 
+            })
+        });
 
-            if (resposta === respostaCorreta) {
-                area.innerHTML = `<div class="mensagem sucesso">✅ Você acertou!<br>Siga para a próxima fase.</div>`;
-                localStorage.setItem('fase1Concluida', 'true');
-                setTimeout(() => {
-                    window.location.href = 'fase2.html';
-                }, 2000);
-            } else if (tentativas > 0) {
-                area.innerHTML = `<div class="mensagem erro">❌ Tente de novo!<br><em>Dica: cada letra foi trocada por outra 5 posições à frente no alfabeto.</em></div>`;
-            } else {
-                area.innerHTML = `<div class="mensagem erro">😔 Suas tentativas acabaram. A resposta era: <strong>${respostaCorreta}</strong><br><a href="fase1.html" style="color:red;">Tentar novamente</a></div>`;
-                document.querySelector('.btn-principal').disabled = true;
-            }
-        }
+        setTimeout(() => {
+            window.location.href = 'fase2.html';
+        }, 2000);
+    } else if (tentativas > 0) {
+        area.innerHTML = `<div class="mensagem erro">❌ Tente de novo!<br><em>Dica: cada letra foi trocada por outra 5 posições à frente no alfabeto</em></div>`;
+    } else {
+        area.innerHTML = `<div class="mensagem erro">😕 Suas tentativas acabaram. A resposta era: <strong>${respostaCorreta}</strong><br><a href="fase1.html">Tentar novamente</a></div>`;
+        document.querySelector('.btn-principal').disabled = true;
+    }
+}
+
     </script>
 </body>
 </html>
