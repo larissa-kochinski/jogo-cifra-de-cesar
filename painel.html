@@ -150,13 +150,12 @@
         }
 
         async function limparDados() {
-            if (confirm('⚠️ Tem certeza que deseja apagar TODOS os dados? Essa ação não pode ser desfeita!')) {
-                // ✅ Caminho atualizado
-                await fetch('/dados?acao=limpar', { method: 'POST' });
-                alert('✅ Todos os dados foram limpos!');
-                await carregarTabela();
-            }
-        }
+    if (confirm('⚠️ Tem certeza que deseja apagar TODOS os dados? Essa ação não pode ser desfeita!')) {
+        await fetch('/dados?acao=limpar', { method: 'POST' });
+        alert('✅ Todos os dados foram limpos!');
+        await carregarTabela();
+    }
+}
 
         window.onload = async function() {
             const nomeGrupo = localStorage.getItem('nomeGrupo');
