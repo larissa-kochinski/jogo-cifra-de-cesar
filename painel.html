@@ -165,6 +165,23 @@
                 document.getElementById('acessoNegado').classList.add('oculto');
             }
         };
+    setInterval(async function() {
+            if (sessionStorage.getItem('adminLogado') === 'sim') {
+                await carregarTabela();
+                await carregarPodio('podioAreaAdmin');
+            } else {
+                const nomeGrupo = localStorage.getItem('nomeGrupo');
+                const resposta = await fetch('/api/dados');
+                const grupos = await resposta.json();
+                const grupoConcluido = grupos.find(g => g.nome === nomeGrupo && g.concluido === 1);
+                
+                if (grupoConcluido) {
+                    document.getElementById('conteudoPublico').classList.remove('oculto');
+                    document.getElementById('acessoNegado').classList.add('oculto');
+                    await carregarPodio('podioAreaPublico');
+                }
+            }
+        }, 5000); // ← tempo em milissegundos (5000 = 5 segundos)
     </script>
 </body>
 </html>
