@@ -31,11 +31,11 @@ export async function onRequestPost({ request, env }) {
     }
     
     if (acao === 'limpar') {
-      await env.jogo_criptografia.prepare("DELETE FROM grupos").run();
-      return new Response(JSON.stringify({ sucesso: true }), {
-        headers: { "Content-Type": "application/json" }
-      });
-    }
+  await env.jogo_criptografia.prepare("DELETE FROM grupos").run();
+  return new Response(JSON.stringify({ sucesso: true }), {
+    headers: { "Content-Type": "application/json" }
+  });
+}
     
     return new Response(JSON.stringify({ erro: "Ação inválida" }), { status: 400 });
   } catch (erro) {
