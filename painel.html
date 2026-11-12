@@ -83,7 +83,8 @@
         }
 
         async function carregarTabela() {
-            const resposta = await fetch('/api/dados');
+            // ✅ Caminho atualizado
+            const resposta = await fetch('/dados');
             const grupos = await resposta.json();
             const tabela = document.getElementById('tabelaGrupos');
             const secaoPodio = document.getElementById('secaoPodio');
@@ -94,7 +95,6 @@
                 return;
             }
 
-            // Mostra todos os grupos e suas fases
             tabela.innerHTML = grupos.map(g => `
                 <tr>
                     <td><strong>${g.nome}</strong></td>
@@ -105,7 +105,6 @@
                 </tr>
             `).join('');
 
-            // Mostra o pódio SOMENTE se houver algum grupo concluído
             const temConcluidos = grupos.some(g => g.concluido === 1);
             if (temConcluidos) {
                 secaoPodio.style.display = 'block';
@@ -117,7 +116,8 @@
 
         async function carregarPodio(elementoId, grupos = null) {
             if (!grupos) {
-                const resposta = await fetch('/api/dados');
+                // ✅ Caminho atualizado
+                const resposta = await fetch('/dados');
                 grupos = await resposta.json();
             }
             const concluidos = grupos.filter(g => g.concluido === 1).sort((a, b) => a.tempo - b.tempo);
@@ -151,16 +151,17 @@
 
         async function limparDados() {
             if (confirm('⚠️ Tem certeza que deseja apagar TODOS os dados? Essa ação não pode ser desfeita!')) {
-                await fetch('/api/dados/limpar', { method: 'POST' });
+                // ✅ Caminho atualizado
+                await fetch('/dados?acao=limpar', { method: 'POST' });
                 alert('✅ Todos os dados foram limpos!');
                 await carregarTabela();
             }
         }
 
-        // Verifica permissão ao carregar a página
         window.onload = async function() {
             const nomeGrupo = localStorage.getItem('nomeGrupo');
-            const resposta = await fetch('/api/dados');
+            // ✅ Caminho atualizado
+            const resposta = await fetch('/dados');
             const grupos = await resposta.json();
             const grupoConcluido = grupos.find(g => g.nome === nomeGrupo && g.concluido === 1);
 
@@ -175,12 +176,12 @@
                 document.getElementById('acessoNegado').classList.remove('oculto');
             }
 
-            // 🔄 Atualização automática a cada 5 segundos
             setInterval(async function() {
                 if (sessionStorage.getItem('adminLogado') === 'sim') {
                     await carregarTabela();
                 } else if (grupoConcluido) {
-                    const r = await fetch('/api/dados');
+                    // ✅ Caminho atualizado
+                    const r = await fetch('/dados');
                     const g = await r.json();
                     await carregarPodio('podioAreaPublico', g);
                 }
