@@ -35,67 +35,67 @@
         </div>
     </div>
 
-    <script>
-        const respostaCorreta = "codigo";
-        let tentativas = 6;
+   <script>
+    const respostaCorreta = "codigo";
+    let tentativas = 6;
+    
+    document.getElementById('nomeUsuario').textContent = 
+        localStorage.getItem('nomeGrupo') ? `Grupo: ${localStorage.getItem('nomeGrupo')}` : '';
+
+    function formatarTempo(segundos) {
+        const min = Math.floor(segundos / 60);
+        const seg = segundos % 60;
+        if (min > 0) return `${min} min e ${seg} seg`;
+        return `${seg} segundos`;
+    }
+
+    async function salvarConclusao(tempoTotal) {
+        const nome = localStorage.getItem('nomeGrupo') || 'Anônimo';
         
-        document.getElementById('nomeUsuario').textContent = 
-            localStorage.getItem('nomeGrupo') ? `Grupo: ${localStorage.getItem('nomeGrupo')}` : '';
+        // Envia para o banco compartilhado
+        await fetch('/api/dados/salvar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                nome: nome, 
+                fase: 3, 
+                tempo: tempoTotal, 
+                concluido: true 
+            })
+        });
+    }
 
-        function formatarTempo(segundos) {
-            const min = Math.floor(segundos / 60);
-            const seg = segundos % 60;
-            if (min > 0) return `${min} min e ${seg} seg`;
-            return `${seg} segundos`;
+    async function verificarResposta() {
+        const resposta = document.getElementById('resposta').value.trim().toLowerCase();
+        const area = document.getElementById('mensagemArea');
+        tentativas--;
+        document.getElementById('tentativas').textContent = tentativas;
+
+        if (tentativas <= 2) {
+            document.getElementById('dicaExtra').classList.remove('oculto');
         }
 
-        function salvarConclusao(tempoTotal) {
-            const nome = localStorage.getItem('nomeGrupo') || 'Anônimo';
-            let grupos = JSON.parse(localStorage.getItem('grupos') || '[]');
+        if (resposta === respostaCorreta) {
+            const tempoFinal = Date.now();
+            const tempoInicio = parseInt(localStorage.getItem('tempoInicio'));
+            const tempoTotal = Math.round((tempoFinal - tempoInicio) / 1000);
             
-            grupos = grupos.filter(g => g.nome !== nome);
+            area.innerHTML = `<div class="mensagem sucesso">🎉 Parabéns! Você completou as três fases!<br>
+                ⏱ Tempo total: <strong>${formatarTempo(tempoTotal)}</strong>
+                <div class="botoes" style="margin-top:15px;">
+                    <a href="painel.html" class="btn btn-principal">🏆 Ver Resultado Final</a>
+                </div></div>`;
             
-            grupos.push({
-                nome: nome,
-                fase: 3,
-                tempo: tempoTotal,
-                concluido: true
-            });
-            
-            localStorage.setItem('grupos', JSON.stringify(grupos));
+            await salvarConclusao(tempoTotal);  // ← com await agora
+            document.querySelector('.btn-principal').disabled = true;
+        } else if (tentativas > 0) {
+            area.innerHTML = `<div class="mensagem erro">❌ Tente de novo!</div>`;
+        } else {
+            area.innerHTML = `<div class="mensagem erro">😔 Suas tentativas acabaram. A resposta era: <strong>${respostaCorreta}</strong><br>
+                <a href="fase3.html" class="btn">Tentar novamente</a></div>`;
+            document.querySelector('.btn-principal').disabled = true;
         }
-
-        function verificarResposta() {
-            const resposta = document.getElementById('resposta').value.trim().toLowerCase();
-            const area = document.getElementById('mensagemArea');
-            tentativas--;
-            document.getElementById('tentativas').textContent = tentativas;
-
-            if (tentativas <= 2) {
-                document.getElementById('dicaExtra').classList.remove('oculto');
-            }
-
-            if (resposta === respostaCorreta) {
-                const tempoFinal = Date.now();
-                const tempoInicio = parseInt(localStorage.getItem('tempoInicio'));
-                const tempoTotal = Math.round((tempoFinal - tempoInicio) / 1000);
-                
-                area.innerHTML = `<div class="mensagem sucesso">🎉 Parabéns! Você completou as três fases!<br>
-                    ⏱ Tempo total: <strong>${formatarTempo(tempoTotal)}</strong>
-                    <div class="botoes" style="margin-top:15px;">
-                        <a href="painel.html" class="btn btn-principal">🏆 Ver Resultado Final</a>
-                    </div></div>`;
-                
-                salvarConclusao(tempoTotal);
-                document.querySelector('.btn-principal').disabled = true;
-            } else if (tentativas > 0) {
-                area.innerHTML = `<div class="mensagem erro">❌ Tente de novo!</div>`;
-            } else {
-                area.innerHTML = `<div class="mensagem erro">😔 Suas tentativas acabaram. A resposta era: <strong>${respostaCorreta}</strong><br>
-                    <a href="fase3.html" class="btn">Tentar novamente</a></div>`;
-                document.querySelector('.btn-principal').disabled = true;
-            }
-        }
-    </script>
+    }
+</script>
 </body>
 </html>
