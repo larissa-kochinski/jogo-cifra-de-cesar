@@ -54,13 +54,13 @@
         
         // Envia para o banco compartilhado
         await fetch('/api/dados/salvar', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                nome: nome, 
-                fase: 3, 
-                tempo: tempoTotal, 
-                concluido: true 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+            nome: nome, 
+            fase: 3, 
+            tempo: tempoTotal, 
+            concluido: true 
             })
         });
     }
