@@ -29,16 +29,27 @@
     </div>
 
     <script>
-        function iniciarDesafio() {
-            const nome = document.getElementById('nomeGrupo').value.trim();
-            if (nome === '') {
-                document.getElementById('aviso').classList.remove('oculto');
-                return;
-            }
-            localStorage.setItem('nomeGrupo', nome);
-            localStorage.setItem('faseAtual', '1');
-            localStorage.setItem('tempoInicio', Date.now());
-            window.location.href = 'fase1.html';
+       async function iniciarDesafio() {
+    const nome = document.getElementById('nomeGrupo').value.trim();
+    if (nome === '') {
+        document.getElementById('aviso').classList.remove('oculto');
+        return;
+    }
+
+    localStorage.setItem('nomeGrupo', nome);
+    localStorage.setItem('faseAtual', '1');
+    localStorage.setItem('tempoInicio', Date.now());
+
+    // Salvar no banco de dados compartilhado
+    await fetch('/api/dados/salvar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome: nome, fase: 1, tempo: 0, concluido: false })
+    });
+
+    window.location.href = 'fase1.html';
+}
+
         }
     </script>
 </body>
